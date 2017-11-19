@@ -1,0 +1,22 @@
+.row.mt-3
+  .col-sm-6.mx-auto
+    h3.text-xs-center New Blog Post
+    form(action='/posts' method='post')
+      .row.form-group
+        .col-sm
+          label.col-form-label
+            | Title
+            sup *
+          input.form-control(name='title' value=form.title)
+          if errors.title
+            p= errors.title
+      .row.form-group
+        .col-sm
+          label.col-form-label
+            | Body
+            sup *
+          textarea.form-control(rows=10 name='body')= form.body
+          if errors.body
+            p= errors.body
+      .form-group
+        button.btn.btn-primary.btn-block(type='submit') Save

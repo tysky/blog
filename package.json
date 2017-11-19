@@ -31,14 +31,17 @@
   },
   "homepage": "https://github.com/tysky/blog#readme",
   "dependencies": {
+    "express": "*",
     "bootstrap": "4.0.0-beta.2"
   },
   "devDependencies": {
     "babel-cli": "*",
     "babel-core": "*",
     "babel-eslint": "*",
+    "babel-jest": "^21.2.0",
     "babel-preset-env": "*",
     "babel-preset-stage-0": "*",
+    "debug": "*",
     "eslint": "^4.7.2",
     "eslint-config-airbnb-base": "*",
     "eslint-plugin-import": "*",

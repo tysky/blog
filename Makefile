@@ -2,7 +2,7 @@ install:
 	npm install
 
 start:
-	npm run babel-node -- src/bin/page-loader.js
+	npm run nodemon -- --exec babel-node src/bin/server.js
 
 publish:
 	npm publish

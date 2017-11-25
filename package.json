@@ -33,6 +33,7 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "*",
+    "method-override": "^2.3.10",
     "morgan": "*",
     "pug": "^2.0.0-rc.4"
   },

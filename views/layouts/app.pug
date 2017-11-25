@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    title Blog
+    link(rel='stylesheet' href='/assets/bootstrap/dist/css/bootstrap-flex.css')
+  body
+    nav.navbar.navbar-light.bg-faded
+      a.navbar-brand(href="/") HexletBlogs
+      ul.nav.navbar-nav.float-xs-right
+        li.nav-item
+          a.nav-link(href="/posts/new") Write Post
+        li.nav-item
+          a.nav-link(href="/posts") My Posts
+    .container
+      .mt-1
+        block content

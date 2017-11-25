@@ -47,4 +47,52 @@ describe('requests', () => {
     const res2 = await query.get(res1.headers.location);
     expect(res2).toHaveHTTPStatus(200);
   });
+
+  it('GET posts/:id/edit', async () => {
+    // const app = solution();
+    const res1 = await request(app)
+      .post('/posts')
+      .type('form')
+      .send({ title: 'post title', body: 'post body' });
+    expect(res1).toHaveHTTPStatus(302);
+    const url = res1.headers.location;
+    const res2 = await request(app)
+      .get(url);
+    expect(res2).toHaveHTTPStatus(200);
+  });
+
+  it('PATCH posts/:id', async () => {
+    const res1 = await request(app)
+      .post('/posts')
+      .type('form')
+      .send({ title: 'post title', body: 'post body' });
+    const url = res1.headers.location.match(/\/posts\/\d+/)[0];
+    const res2 = await request(app)
+      .patch(url)
+      .type('form')
+      .send({ title: 'new post title', body: 'new post body' });
+    expect(res2).toHaveHTTPStatus(302);
+  });
+
+  it('PATCH posts/:id (unproccessable entity)', async () => {
+    const res1 = await request(app)
+      .post('/posts')
+      .type('form')
+      .send({ title: 'post title', body: 'post body' });
+    const url = res1.headers.location.match(/\/posts\/\d+/)[0];
+    const res2 = await request(app)
+      .patch(url);
+    expect(res2).toHaveHTTPStatus(422);
+  });
+
+  it('DELETE posts/:id', async () => {
+    const res1 = await request(app)
+      .post('/posts')
+      .type('form')
+      .send({ title: 'post title', body: 'post body' });
+    const url = res1.headers.location.match(/\/posts\/\d+/)[0];
+    const res2 = await request(app)
+      .delete(url);
+    expect(res2).toHaveHTTPStatus(302);
+  });
 });

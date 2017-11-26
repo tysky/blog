@@ -1,12 +1,11 @@
 extends layouts/app.pug
 
 block content
-  h3 links
-
-  table.table
-    tr
-      th Title
+  h3 Posts
+  if posts.length > 0
+    ul
     for post in posts
-      tr
-        td
-          a(href=`/posts/${post.id}`)= post.title
+      .list-group
+        a.list-item(href=`/posts/${post.id}`)= post.title
+  else
+    p Пусто

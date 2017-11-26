@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import methodOverride from 'method-override';
 
 import Post from './entities/Post';
+import NotFoundError from './errors/NotFoundError';
 
 const app = new Express();
 
@@ -31,6 +32,15 @@ app.get('/posts/new', (req, res) => {
   res.render('posts/new', { form: {}, errors: {} });
 });
 
+app.get('/posts/:id', (req, res, next) => {
+  const post = posts.find(_post => _post.id.toString() === req.params.id);
+  if (post) {
+    res.render('posts/show', { post });
+  } else {
+    next(new NotFoundError());
+  }
+});
+
 app.get('/posts/:id', (req, res) => {
   const post = posts.find(_post => _post.id.toString() === req.params.id);
   res.render('posts/show', { post });
@@ -38,18 +48,25 @@ app.get('/posts/:id', (req, res) => {
 
 app.post('/posts', (req, res) => {
   const { title, body } = req.body;
-  if (!title || !body) {
-    const error = {
-      title: 'Error! Title is empty!',
-      body: 'Error! Post is empty!',
-    };
-    res.status(422);
-    res.render('posts/show', error);
-  } else {
-    const newPost = new Post(title, body);
-    posts.push(newPost);
-    res.redirect(302, `/posts/${newPost.id}`);
+
+  const errors = {};
+  if (!title) {
+    errors.title = "Can't be blank";
   }
+
+  if (!body) {
+    errors.body = "Can't be blank";
+  }
+
+  if (Object.keys(errors).length === 0) {
+    const post = new Post(title, body);
+    posts.push(post);
+    res.redirect(`/posts/${post.id}`);
+    return;
+  }
+
+  res.status(422);
+  res.render('posts/new', { form: req.body, errors });
 });
 
 app.get('/posts/:id/edit', (req, res) => {
@@ -59,26 +76,48 @@ app.get('/posts/:id/edit', (req, res) => {
 });
 
 app.patch('/posts/:id', (req, res) => {
+  const post = posts.find(_post => _post.id.toString() === req.params.id);
   const { title, body } = req.body;
-  if (!title || !body) {
-    const error = {
-      title: 'Error! Title is empty!',
-      body: 'Error! Post is empty!',
-    };
-    res.status(422);
-    res.render('posts/show', error);
-  } else {
-    const post = posts.find(_post => _post.id.toString() === req.params.id);
+
+  const errors = {};
+  if (!title) {
+    errors.title = "Can't be blank";
+  }
+
+  if (!body) {
+    errors.body = "Can't be blank";
+  }
+
+  if (Object.keys(errors).length === 0) {
     post.title = title;
     post.body = body;
-    res.redirect(302, `/posts/${post.id}`);
+    res.redirect(`/posts/${post.id}/edit`);
+    return;
   }
+
+  res.status(422);
+  res.render('posts/edit', { post, form: req.body, errors });
 });
 
 app.delete('/posts/:id', (req, res) => {
   const post = posts.find(_post => _post.id.toString() === req.params.id);
   posts = posts.filter(el => el !== post);
   res.redirect(302, '/');
+});
+
+app.use((req, res, next) => {
+  next(new NotFoundError());
+});
+
+app.use((err, req, res, next) => { //eslint-disable-line
+  res.status(err.status);
+  switch (err.status) {
+    case 404:
+      res.render(err.status.toString());
+      break;
+    default:
+      res.render('500');
+  }
 });
 
 export default app;

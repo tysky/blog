@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import methodOverride from 'method-override';
 
 import encrypt from './encrypt';
+import flash from './flash';
 import User from './entities/User';
 import Guest from './entities/Guest';
 import Post from './entities/Post';
@@ -24,6 +25,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+app.use(flash());
 
 const requiredAuth = (req, res, next) => { // eslint-disable-line
   if (res.locals.currentUser.isGuest()) {
@@ -77,6 +79,7 @@ app.post('/users', (req, res) => {
   if (Object.keys(errors).length === 0) {
     const user = new User(nickname, encrypt(password));
     users.push(user);
+    res.flash('info', `Welcome, ${user.nickname}!`);
     res.redirect('/');
     return;
   }
@@ -94,6 +97,7 @@ app.post('/session', (req, res) => {
   const user = users.find(_user => _user.nickname === nickname);
   if (user && user.passwordDigest === encrypt(password)) {
     req.session.nickname = user.nickname;
+    res.flash('info', `Welcome, ${user.nickname}!`);
     res.redirect('/');
     return;
   }
@@ -103,6 +107,7 @@ app.post('/session', (req, res) => {
 
 app.delete('/session', (req, res) => {
   delete req.session.nickname;
+  res.flash('info', `Good bye, ${res.locals.currentUser.nickname}`);
   res.redirect('/');
 });
 

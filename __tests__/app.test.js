@@ -95,14 +95,34 @@ describe('requests', () => {
     expect(res2).toHaveHTTPStatus(422);
   });
 
+  it('DELETE posts/:id (unauthorised user)', async () => {
+    const res1 = await request(app)
+      .post('/posts')
+      .type('form')
+      .send({ title: 'post title', body: 'post body' });
+    const url = res1.headers.location;
+    const res2 = await request(app)
+      .delete(url);
+    expect(res2).toHaveHTTPStatus(403);
+  });
+
   it('DELETE posts/:id', async () => {
     const res1 = await request(app)
       .post('/posts')
       .type('form')
       .send({ title: 'post title', body: 'post body' });
-    const url = res1.headers.location.match(/\/posts\/\d+/)[0];
+    const url = res1.headers.location;
+
+    const authRes = await request(app)
+      .post('/session')
+      .type('form')
+      .send({ nickname: 'admin', password: 'qwerty' });
+    expect(authRes).toHaveHTTPStatus(302);
+    const cookie = authRes.headers['set-cookie'];
+
     const res2 = await request(app)
-      .delete(url);
+      .delete(url)
+      .set('Cookie', cookie);
     expect(res2).toHaveHTTPStatus(302);
   });
 });

@@ -9,6 +9,7 @@ import User from './entities/User';
 import Guest from './entities/Guest';
 import Post from './entities/Post';
 import NotFoundError from './errors/NotFoundError';
+import AccessDeniedError from './errors/AccessDeniedError';
 
 const app = new Express();
 
@@ -23,6 +24,13 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+
+const requiredAuth = (req, res, next) => { // eslint-disable-line
+  if (res.locals.currentUser.isGuest()) {
+    return next(new AccessDeniedError());
+  }
+  next();
+};
 
 const users = [new User('admin', encrypt('qwerty'))];
 
@@ -173,7 +181,7 @@ app.patch('/posts/:id', (req, res) => {
   res.render('posts/edit', { post, form: req.body, errors });
 });
 
-app.delete('/posts/:id', (req, res) => {
+app.delete('/posts/:id', requiredAuth, (req, res) => {
   const post = posts.find(_post => _post.id.toString() === req.params.id);
   posts = posts.filter(el => el !== post);
   res.redirect(302, '/');

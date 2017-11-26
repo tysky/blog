@@ -3,6 +3,7 @@ import matchers from 'jest-supertest-matchers';
 
 import app from '..';
 
+
 describe('requests', () => {
   beforeAll(() => {
     jasmine.addMatchers(matchers); //eslint-disable-line
@@ -11,6 +12,11 @@ describe('requests', () => {
   test('GET /', async () => {
     const res = await request(app).get('/');
     expect(res).toHaveHTTPStatus(200);
+  });
+
+  it('GET /undefined', async () => {
+    const res = await request(app).get('/undefined');
+    expect(res).toHaveHTTPStatus(404);
   });
 
   it('GET /posts', async () => {
@@ -48,8 +54,12 @@ describe('requests', () => {
     expect(res2).toHaveHTTPStatus(200);
   });
 
+  it('GET posts/:id 404', async () => {
+    const res = await request(app).get('/posts/100');
+    expect(res).toHaveHTTPStatus(404);
+  });
+
   it('GET posts/:id/edit', async () => {
-    // const app = solution();
     const res1 = await request(app)
       .post('/posts')
       .type('form')
